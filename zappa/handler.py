@@ -556,7 +556,9 @@ class LambdaHandler:
                         if settings.DOMAIN:
                             # Assume the requests received will be on the specified
                             # domain. No special handling is required
-                            pass
+                            if settings.CDN_DOMAIN:
+                                headers["Host"] = settings.CDN_DOMAIN
+                                logger.debug("changed host with settings.CDN_DOMAIN: [{}]".format(headers["Host"]))
                         else:
                             # Assume the requests received will be to the
                             # amazonaws.com endpoint, so tell Flask to include the
