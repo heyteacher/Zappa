@@ -551,14 +551,20 @@ class LambdaHandler:
                             # stage, so we must tell Flask to include the API
                             # stage in the url it calculates. See https://github.com/Miserlou/Zappa/issues/1014
                             script_name = "/" + settings.API_STAGE
+                        if not os.environ.get('CDN_DOMAIN','') == '': 
+                            event['headers']['Host'] = os.environ.get('CDN_DOMAIN')
+                            event['multiValueHeaders']['Host'] = [os.environ.get('CDN_DOMAIN')]
+                            event['requestContext']['domainPrefix'] = os.environ.get('CDN_DOMAIN') 
+                            event['requestContext']['domainName'] = os.environ.get('CDN_DOMAIN')
+                            event['Host'] = os.environ.get('CDN_DOMAIN')
+                            logger.debug("changed host with env variable CDN_DOMAIN: [{}]".format(event["Host"]))
+
                     else:
                         # This is a test request sent from the AWS console
                         if settings.DOMAIN:
                             # Assume the requests received will be on the specified
                             # domain. No special handling is required
-                            if settings.CDN_DOMAIN:
-                                headers["Host"] = settings.CDN_DOMAIN
-                                logger.debug("changed host with settings.CDN_DOMAIN: [{}]".format(headers["Host"]))
+                            pass
                         else:
                             # Assume the requests received will be to the
                             # amazonaws.com endpoint, so tell Flask to include the
